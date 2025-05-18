@@ -3,7 +3,6 @@ package customerimporter_test
 import (
 	"TeamworkGoTests/customerimporter"
 	"os"
-
 	"reflect"
 	"sort"
 	"testing"
@@ -17,7 +16,6 @@ func sortDomainCounts(counts []customerimporter.DomainCount) {
 	})
 }
 
-// Define sample data for testing
 const sampleCSVData = `first_name,last_name,email,gender,ip_address
 Mildred,Hernandez,mhernandez0@github.io,Female,38.194.51.128
 Bonnie,Ortiz,bortiz1@cyberchimps.com,Female,197.54.209.129
@@ -54,14 +52,13 @@ func TestProcessCSV_NonExistentFile(t *testing.T) {
 
 func TestProcessCSV_SampleData(t *testing.T) {
 	tmpFilePath := createTempFile(t, sampleCSVData)
-	defer os.Remove(tmpFilePath) // Clean up the temporary file after the test
-	// Process the temporary file
+	defer os.Remove(tmpFilePath)
+
 	counts, err := customerimporter.ProcessCSV(tmpFilePath)
 	if err != nil {
 		t.Fatalf("Expected no error for sample data, got: %v", err)
 	}
 
-	// Define expected counts
 	expectedCounts := []customerimporter.DomainCount{
 		{Domain: "github.io", Count: 3},
 		{Domain: "cyberchimps.com", Count: 1},
@@ -79,20 +76,18 @@ func TestProcessCSV_SampleData(t *testing.T) {
 }
 
 func createTempFile(t *testing.T, data string) string {
-	// Create a temporary file. The second argument is the pattern for the filename.
 	tmpFile, err := os.CreateTemp("", "sample_*.csv")
 	if err != nil {
 		t.Fatalf("Failed to create temp file: %v", err)
 	}
-	// Get the path before deferring close and remove
+
 	tmpFilePath := tmpFile.Name()
-	// Write the data to the temporary file
+
 	_, err = tmpFile.Write([]byte(data))
 	if err != nil {
 		t.Fatalf("Failed to write to temp file: %v", err)
 	}
 
-	// We must close the file before ProcessCSV tries to open it again
 	err = tmpFile.Close()
 	if err != nil {
 		t.Fatalf("Failed to close temp file: %v", err)
