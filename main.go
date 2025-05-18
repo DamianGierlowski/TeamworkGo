@@ -13,6 +13,7 @@ func main() {
 	csvFilePath := flag.String("input", "", "Path to the CSV file")
 	outputFilename := flag.String("output", "", "Path to the json file")
 	flag.Parse()
+
 	if *csvFilePath == "" {
 		log.Fatalf("csv file path is required")
 	}

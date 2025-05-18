@@ -25,20 +25,21 @@ func ProcessCSV(filePath string) ([]DomainCount, error) {
 	domainCounts := make(map[string]int)
 
 	reader, closeFunc, err := readFromFile(filePath)
+
 	if err != nil {
+
 		return nil, err
 	}
+
+	defer closeFunc()
 
 	for {
 		record, err := reader.Read()
 		if err == io.EOF {
-			defer closeFunc()
-
 			break
 		}
 
 		if err != nil {
-			defer closeFunc()
 			return nil, fmt.Errorf("error reading CSV record: %w", err)
 		}
 
