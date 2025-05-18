@@ -24,23 +24,22 @@ func ProcessCSV(filePath string) ([]DomainCount, error) {
 
 	domainCounts := make(map[string]int)
 
-	file := ReadFile(filePath)
-
-	if file == nil {
-		// readFile logs the error, so we just need to return a meaningful error
-		return nil, fmt.Errorf("failed to open file: %s", filePath)
+	reader, closeFunc, err := readFromFile(filePath)
+	if err != nil {
+		return nil, err
 	}
-	reader := csv.NewReader(*file)
 
 	for {
-		record, err := (*reader).Read()
+		record, err := reader.Read()
 		if err == io.EOF {
+			defer closeFunc()
+
 			break
 		}
 
 		if err != nil {
-			log.Printf("Error reading CSV record: %v", err)
-			continue
+			defer closeFunc()
+			return nil, fmt.Errorf("error reading CSV record: %w", err)
 		}
 
 		if len(record) > 2 {
@@ -50,7 +49,7 @@ func ProcessCSV(filePath string) ([]DomainCount, error) {
 				domain := parts[1]
 				domainCounts[domain]++
 			} else {
-				log.Printf("Invalid email format: %s", email)
+				log.Printf("invalid email format: %s", email)
 			}
 		}
 	}
@@ -63,13 +62,18 @@ func ProcessCSV(filePath string) ([]DomainCount, error) {
 	return domainCountList, nil
 }
 
-func ReadFile(filePath string) **os.File {
+func readFromFile(filePath string) (*csv.Reader, func() error, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return nil
+		return nil, nil, fmt.Errorf("opening file: %w", err)
+	}
+	closeFunc := func() error {
+		return file.Close()
 	}
 
-	return &file
+	reader := csv.NewReader(file)
+
+	return reader, closeFunc, nil
 }
 
 func verifyDomain(domain string) bool {
