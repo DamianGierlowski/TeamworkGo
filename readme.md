@@ -12,14 +12,18 @@ Dennis,Henry,dhenry2@hubpages.com,Male,155.75.186.217
 
 ## How to use
 
+## Pull
+```bash
+git clone https://github.com/DamianGierlowski/TeamworkGoTests.git
+```
+
 ### Start
 ```bash
-go run main.go -input customers.csv -output data.json
-``` 
+go run cmd/main.go -input customers.csv -output data.json
+```
 
 ### Tests
 
 ```bash
-go test ./customerimporter
+go test ./internal/customerimporter
 ```
-

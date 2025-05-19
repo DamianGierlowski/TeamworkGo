@@ -1,7 +1,7 @@
 package customerimporter_test
 
 import (
-	"TeamworkGoTests/customerimporter"
+	"TeamworkGoTests/internal/customerimporter"
 	"os"
 	"reflect"
 	"sort"
